@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Slop Shield — fake jobs r NOT that deep</title>
+  <meta name="description" content="Browser extension that roasts fake job listings on LinkedIn, Indeed, Naukri and Gmail and stamps them AI SLOP in real time. Free, local, unhinged." />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================================================
+       SLOP SHIELD — gen z build
+       neubrutalist x y2k x dopamine: lilac / butter / lime / tangerine
+       chunky ink borders, hard shadows, stickers, marquee, kinetic type
+       no gradients, no glassmorphism, no corporate blue
+       ============================================================ */
+    :root {
+      --ink: #1a1a2e;
+      --lilac: #c7b9ff;
+      --butter: #ffe37e;
+      --lime: #c4f153;
+      --tangerine: #ff6b35;
+      --bubblegum: #ff9ecb;
+      --paper: #faf7f2;
+      --border: 3px solid var(--ink);
+      --shadow: 6px 6px 0 var(--ink);
+      --shadow-lg: 10px 10px 0 var(--ink);
+      --display: "Archivo Black", "Arial Black", sans-serif;
+      --body: "Space Grotesk", "Helvetica", sans-serif;
+      --mono: "Space Mono", "Courier New", monospace;
+      --gutter: clamp(20px, 4.5vw, 70px);
+      --ease: cubic-bezier(0.34, 1.56, 0.64, 1); /* bouncy */
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: initial; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--body);
+      font-size: 17px;
+      line-height: 1.55;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    ::selection { background: var(--tangerine); color: var(--paper); }
+
+    /* ---------- chunky buttons ---------- */
+    .btn {
+      display: inline-flex; align-items: center; gap: 12px;
+      font-family: var(--body); font-weight: 700; font-size: 16px;
+      padding: 16px 28px;
+      border: var(--border); box-shadow: var(--shadow);
+      background: var(--lime); color: var(--ink);
+      transition: transform 0.18s var(--ease), box-shadow 0.18s var(--ease);
+      cursor: pointer;
+    }
+    .btn:hover { transform: translate(-3px, -3px); box-shadow: var(--shadow-lg); }
+    .btn:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--ink); }
+    .btn.butter { background: var(--butter); }
+    .btn.lilac { background: var(--lilac); }
+    .btn.big { font-size: 19px; padding: 20px 36px; border-width: 4px; }
+
+    /* ---------- stickers ---------- */
+    .sticker {
+      display: inline-block;
+      font-family: var(--display);
+      font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase;
+      padding: 8px 14px;
+      border: var(--border);
+      transform: rotate(-3deg);
+    }
+    .sticker.r1 { transform: rotate(3deg); }
+    .sticker.r2 { transform: rotate(-6deg); }
+    .sticker.lime { background: var(--lime); box-shadow: var(--shadow); }
+    .sticker.butter { background: var(--butter); box-shadow: var(--shadow); }
+    .sticker.tangerine { background: var(--tangerine); color: var(--paper); box-shadow: var(--shadow); }
+    .sticker.lilac { background: var(--lilac); box-shadow: var(--shadow); }
+
+    /* ---------- marquee ---------- */
+    .marquee {
+      background: var(--ink); color: var(--paper);
+      font-family: var(--display);
+      font-size: 15px; text-transform: uppercase; letter-spacing: 0.06em;
+      padding: 13px 0; overflow: hidden;
+      border-bottom: var(--border);
+    }
+    .marquee-track { display: flex; width: max-content; animation: marq 22s linear infinite; }
+    .marymarquee-track span, .marquee span { padding: 0 28px; white-space: nowrap; }
+    .marquee em { font-style: normal; color: var(--lime); }
+    .marquee:nth-child(even) em { color: var(--butter); }
+    @keyframes marq { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* ---------- topbar ---------- */
+    .topbar {
+      position: sticky; top: 0; z-index: 60;
+      background: var(--paper);
+      border-bottom: var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px var(--gutter);
+      gap: 16px;
+    }
+    .logo {
+      font-family: var(--display);
+      font-size: 23px; letter-spacing: -0.01em;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .logo .box {
+      background: var(--tangerine); color: var(--paper);
+      border: var(--border); box-shadow: var(--shadow);
+      padding: 5px 11px; transform: rotate(-2deg);
+    }
+    .topbar nav { display: flex; gap: 8px; font-family: var(--mono); font-size: 12px; font-weight: 700; text-transform: uppercase; }
+    .topbar nav a {
+      padding: 8px 13px; border: var(--border); background: var(--paper);
+      transition: all 0.15s var(--ease);
+    }
+    .topbar nav a:hover { background: var(--butter); box-shadow: var(--shadow); transform: translate(-2px, -2px); }
+    @media (max-width: 880px) { .topbar nav { display: none; } }
+
+    /* ---------- hero ---------- */
+    .hero {
+      padding: 90px var(--gutter) 70px;
+      display: flex; flex-direction: column; align-items: flex-start; gap: 36px;
+      position: relative;
+    }
+    .hero .stickers { display: flex; gap: 20px; flex-wrap: wrap; }
+    .hero h1 {
+      font-family: var(--display);
+      font-size: clamp(44px, 9.6vw, 130px);
+      line-height: 0.98; letter-spacing: -0.015em;
+      text-transform: uppercase;
+      max-width: 15ch;
+    }
+    .hero h1 .word { display: inline-block; opacity: 0; transform: translateY(0.5em) rotate(3deg); }
+    .hero.h1-in .hero h1 .word, body.h1-in .hero h1 .word {
+      opacity: 1; transform: none;
+      transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: var(--lime); border: var(--border); box-shadow: var(--shadow);
+      padding: 0 0.16em; display: inline-block; transform: rotate(-2deg);
+    }
+    .hero h1 i.alt {
+      font-style: normal;
+      background: var(--bubblegum); border: var(--border); box-shadow: var(--shadow);
+      padding: 0 0.16em; display: inline-block; transform: rotate(2deg);
+    }
+    .hero .lede { max-width: 56ch; font-size: 19px; font-weight: 500; line-height: 1.65; }
+    .hero .lede b { background: var(--butter); padding: 0 5px; border: 2.5px solid var(--ink); }
+    .hero .row { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; }
+    .hero .note { font-family: var(--mono); font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; display: flex; gap: 22px; flex-wrap: wrap; }
+    .hero .note span::before { content: "✦"; margin-right: 7px; color: var(--tangerine); }
+
+    /* floating doodle shapes (pure CSS, no gradients) */
+    .doodle { position: absolute; z-index: 0; pointer-events: none; }
+    .doodle.d1 { top: 110px; right: 9%; width: 64px; height: 64px; background: var(--lilac); border: var(--border); border-radius: 50%; box-shadow: var(--shadow); animation: floaty 5s ease-in-out infinite; }
+    .doodle.d2 { bottom: 130px; right: 30%; width: 44px; height: 44px; background: var(--butter); border: var(--border); box-shadow: var(--shadow); transform: rotate(15deg); animation: floaty 6s ease-in-out 0.8s infinite; }
+    .doodle.d3 { top: 260px; left: 55%; width: 34px; height: 34px; background: var(--tangerine); border-radius: 50%; border: var(--border); box-shadow: var(--shadow); animation: floaty 4.4s ease-in-out 1.4s infinite; }
+    @keyframes floaty { 0%,100% { translate: 0 0; } 50% { translate: 0 -14px; } }
+    @media (max-width: 900px) { .doodle { display: none; } }
+
+    /* ---------- section base ---------- */
+    section { padding: 90px var(--gutter); position: relative; }
+    .sec-tag {
+      font-family: var(--mono); font-weight: 700; font-size: 12px;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 8px 14px; border: var(--border); box-shadow: var(--shadow);
+      margin-bottom: 38px;
+    }
+    h2.display {
+      font-family: var(--display);
+      font-size: clamp(34px, 5.6vw, 72px);
+      line-height: 1.02; letter-spacing: -0.01em; text-transform: uppercase;
+      margin-bottom: 44px; max-width: 20ch;
+    }
+    h2.display .hl-lime { background: var(--lime); border: var(--border); box-shadow: var(--shadow); padding: 0 0.14em; display: inline-block; transform: rotate(-1.5deg); }
+    h2.display .hl-lilac { background: var(--lilac); border: var(--border); box-shadow: var(--shadow); padding: 0 0.14em; display: inline-block; transform: rotate(1.5deg); }
+    h2.display .hl-butter { background: var(--butter); border: var(--border); box-shadow: var(--shadow); padding: 0 0.14em; display: inline-block; transform: rotate(-2deg); }
+
+    /* ---------- how it works: sticker cards grid ---------- */
+    .how { background: var(--lilac); border-top: var(--border); border-bottom: var(--border); }
+    .how-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+    @media (max-width: 1100px) { .how-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) { .how-grid { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--paper); border: var(--border); box-shadow: var(--shadow);
+      padding: 26px 22px 30px; position: relative;
+      transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+    }
+    .card:hover { transform: translate(-4px, -4px) rotate(-1deg); box-shadow: var(--shadow-lg); }
+    .card:nth-child(odd) { transform: rotate(-0.6deg); }
+    .card:nth-child(even) { transform: rotate(0.6deg); }
+    .card .num {
+      font-family: var(--display); font-size: 15px;
+      background: var(--tangerine); color: var(--paper);
+      border: 3px solid var(--ink); padding: 5px 11px;
+      display: inline-block; transform: rotate(-3deg); margin-bottom: 18px;
+    }
+    .card:nth-child(2) .num { background: var(--butter); color: var(--ink); }
+    .card:nth-child(3) .num { background: var(--lime); color: var(--ink); }
+    .card:nth-child(4) .num { background: var(--bubblegum); color: var(--ink); }
+    .card h3 { font-family: var(--display); font-size: 21px; text-transform: uppercase; margin-bottom: 10px; line-height: 1.1; }
+    .card p { font-size: 15px; line-height: 1.6; color: rgba(26,26,46,0.78); }
+    .card p b { background: var(--butter); padding: 0 3px; }
+
+    /* ---------- theatre ---------- */
+    .theatre { background: var(--butter); border-bottom: var(--border); }
+    .theatre-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: stretch; }
+    @media (max-width: 880px) { .theatre-grid { grid-template-columns: 1fr; } }
+    .phone {
+      background: var(--paper); border: var(--border);
+      box-shadow: var(--shadow-lg);
+      padding: 0 0 22px;
+      max-width: 440px;
+    }
+    .phone .appbar {
+      background: var(--ink); color: var(--paper);
+      font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 10px 16px; border-bottom: var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .phone .appbar .dots { display: flex; gap: 6px; }
+    .phone .appbar .dots i { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--paper); display: block; }
+    .phone .appbar .dots i:nth-child(1) { background: var(--tangerine); }
+    .phone .appbar .dots i:nth-child(2) { background: var(--butter); }
+    .phone .appbar .dots i:nth-child(3) { background: var(--lime); }
+    .job {
+      margin: 18px 16px 0; border: 3px solid var(--ink); padding: 18px 16px 14px;
+      background: #fff; position: relative;
+    }
+    .job.slop { background: #fff2f0; }
+    .job h5 { font-family: var(--body); font-weight: 700; font-size: 17px; line-height: 1.25; }
+    .job .meta { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(26,26,46,0.6); margin: 5px 0 9px; }
+    .job p { font-size: 13.5px; color: rgba(26,26,46,0.8); line-height: 1.55; }
+    .badge {
+      position: absolute; top: -14px; right: -10px;
+      font-family: var(--display); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em;
+      padding: 5px 10px; border: 3px solid var(--ink); box-shadow: 4px 4px 0 var(--ink);
+      transform: rotate(4deg);
+    }
+    .badge.fake { background: var(--tangerine); color: var(--paper); }
+    .badge.ok { background: var(--lime); color: var(--ink); }
+    .stamp-big {
+      position: absolute; top: 46%; left: 50%;
+      font-family: var(--display); font-size: 34px; text-transform: uppercase; letter-spacing: 0.03em;
+      color: var(--tangerine);
+      border: 4px solid var(--tangerine);
+      padding: 6px 18px;
+      transform: translate(-50%, -50%) rotate(-9deg) scale(2.6);
+      opacity: 0; pointer-events: none;
+      background: rgba(255,255,255,0.7);
+      animation: stampgogogo 0.7s steps(4, jump-none) forwards;
+    }
+    @keyframes stampgogogo {
+      0%   { opacity: 0;   transform: translate(-50%,-50%) rotate(-2deg) scale(2.6); }
+      40%  { opacity: 1;   transform: translate(-50%, -52%) rotate(-11deg) scale(0.9); }
+      75%  { opacity: 1;   transform: translate(-50%, -48%) rotate(-7deg) scale(1.06); }
+      100% { opacity: 0.94; transform: translate(-50%, -50%) rotate(-9deg) scale(1); }
+    }
+    .verdict-strip {
+      margin: 12px 16px 0; border-top: 3px dashed rgba(26,26,46,0.3);
+      padding-top: 12px; font-family: var(--mono); font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .verdict-strip .sc { color: var(--tangerine); }
+    .verdict-strip .sc.ok { color: #3f7d20; }
+    .theatre .foot {
+      margin-top: 34px; display: flex; gap: 18px; align-items: center; flex-wrap: wrap;
+      font-family: var(--mono); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+
+    /* ---------- pattern table ---------- */
+    .patterns { background: var(--paper); border-bottom: var(--border); }
+    .ptable { border: var(--border); box-shadow: var(--shadow-lg); background: #fff; }
+    .prow {
+      display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.6fr) 110px;
+      gap: 20px; padding: 18px 22px; align-items: center;
+      border-bottom: 3px solid var(--ink);
+      font-size: 15px;
+      transition: background 0.12s;
+    }
+    .prow:last-child { border-bottom: 0; }
+    .prow:hover { background: var(--butter); }
+    .prow .nm { font-weight: 700; font-size: 16.5px; }
+    .prow .ds { color: rgba(26,26,46,0.7); font-size: 14px; }
+    .prow .wt {
+      font-family: var(--mono); font-weight: 700; font-size: 12px; text-align: center;
+      border: 2.5px solid var(--ink); padding: 5px 7px; justify-self: end;
+      background: var(--lime);
+    }
+    .prow:nth-child(1) .wt, .prow:nth-child(2) .wt { background: var(--tangerine); color: var(--paper); }
+    .legend { margin-top: 26px; display: flex; gap: 16px; flex-wrap: wrap; font-family: var(--mono); font-size: 12px; font-weight: 700; text-transform: uppercase; }
+    .legend span { border: 3px solid var(--ink); padding: 8px 14px; background: var(--lilac); box-shadow: var(--shadow); }
+    .legend span:nth-child(2) { background: var(--butter); }
+    .legend span:nth-child(3) { background: var(--lime); }
+
+    /* ---------- install ---------- */
+    .install { background: var(--tangerine); color: var(--ink); border-bottom: var(--border); }
+    .install .btn { background: var(--butter); }
+    .install-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 50px; align-items: start; }
+    @media (max-width: 880px) { .install-grid { grid-template-columns: 1fr; } }
+    .steps { border: var(--border); background: var(--paper); box-shadow: var(--shadow-lg); padding: 8px 0; }
+    .steps li {
+      list-style: none; padding: 17px 22px 17px 66px; position: relative;
+      border-bottom: 3px solid var(--ink); font-size: 15px; font-weight: 500;
+    }
+    .steps li:last-child { border-bottom: 0; }
+    .steps li::before {
+      content: counter(st); counter-increment: st;
+      position: absolute; left: 18px; top: 50%; translate: 0 -50%;
+      font-family: var(--display); font-size: 15px;
+      width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+      background: var(--lilac); border: 3px solid var(--ink); box-shadow: 3px 3px 0 var(--ink);
+      transform: rotate(-4deg);
+    }
+    .steps li:nth-child(even)::before { background: var(--butter); transform: rotate(3deg); }
+    .steps { counter-reset: st; }
+    .steps code { font-family: var(--mono); font-size: 12.5px; font-weight: 700; background: var(--lime); border: 2px solid var(--ink); padding: 2px 7px; }
+    .steps strong { background: var(--butter); padding: 0 3px; }
+
+    /* ---------- footer ---------- */
+    footer { padding: 70px var(--gutter) 40px; background: var(--paper); }
+    .foot-mark {
+      font-family: var(--display); font-size: clamp(40px, 9vw, 120px);
+      text-transform: uppercase; line-height: 0.95; letter-spacing: -0.02em;
+      display: flex; justify-content: space-between; align-items: flex-end; gap: 22px; flex-wrap: wrap;
+    }
+    .foot-mark .wob {
+      display: inline-block;
+      background: var(--lime); border: 4px solid var(--ink); box-shadow: var(--shadow-lg);
+      padding: 0 0.16em; transform: rotate(-2deg);
+    }
+    .foot-row {
+      margin-top: 46px; padding-top: 22px; border-top: 3px solid var(--ink);
+      display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+      font-family: var(--mono); font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .foot-row a { border-bottom: 3px solid var(--tangerine); }
+    .foot-row a:hover { background: var(--butter); }
+
+    /* ---------- reveal ---------- */
+    .reveal { opacity: 0; transform: translateY(26px) rotate(-1deg); }
+    .reveal.in { opacity: 1; transform: none; transition: opacity 0.55s var(--ease), transform 0.55s var(--ease); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .marquee-track, .doodle { animation: none; }
+      .stamp-big { animation: none; opacity: 0.94; transform: translate(-50%,-50%) rotate(-9deg) scale(1); }
+      .reveal, .hero h1 .word { opacity: 1; transform: none; transition: none; }
+    }
+    body.h1-in .hero h1 .word { opacity: 1; transform: none; }
+  </style>
+</head>
+<body>
+
+  <!-- marquee -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>FAKE JOBS R NOT THAT DEEP <em>✦</em> WE FLAG, U MOVE ON <em>✦</em> LINKEDIN ✕ INDEED ✕ NAUKRI ✕ GMAIL <em>✦</em> 13 PATTERNS, 0 CAPS <em>✦</em> LOCALLY ON UR MACHINE, NO SNITCHING <em>✦</em> FAKE JOBS R NOT THAT DEEP <em>✦</em> WE FLAG, U MOVE ON <em>✦</em> LINKEDIN ✕ INDEED ✕ NAUKRI ✕ GMAIL <em>✦</em> 13 PATTERNS, 0 CAPS <em>✦</em> LOCALLY ON UR MACHINE, NO SNITCHING <em>✦</em></span>
+    </div>
+  </div>
+
+  <!-- topbar -->
+  <div class="topbar">
+    <a class="logo" href="#top"><span class="box">SLOP</span>SHIELD</a>
+    <nav>
+      <a href="#how">how</a>
+      <a href="#theatre">receipts</a>
+      <a href="#patterns">patterns</a>
+      <a href="#install">install</a>
+    </nav>
+    <a class="sticker butter" href="slop-shield-extension.zip" download style="font-size: 11px;">↓ get it free</a>
+  </div>
+
+  <!-- hero -->
+  <header class="hero" id="top">
+    <div class="doodle d1"></div>
+    <div class="doodle d2"></div>
+    <div class="doodle d3"></div>
+
+    <div class="stickers">
+      <span class="sticker lime">100% local, fr fr</span>
+      <span class="sticker butter r1">no login. no vibes. just facts.</span>
+      <span class="sticker tangerine r2">free forever</span>
+    </div>
+
+    <h1>
+      fake jobs<br />
+      get <em>stamped</em><br />
+      <i class="alt">instantly.</i>
+    </h1>
+
+    <p class="lede">
+      Slop Shield reads every listing on <b>LinkedIn, Indeed, Naukri & Gmail</b> the second it shows up,
+      then actually <b>scans the company's real website</b> with a web agent before it stamps the sus ones <b>AI SLOP</b>.
+    </p>
+
+    <div class="row">
+      <a class="btn big" href="slop-shield-extension.zip" download>↓ get the extension</a>
+      <a class="btn butter" href="#theatre">see it cook ⟶</a>
+    </div>
+
+    <div class="note">
+      <span>web-verified verdicts</span>
+      <span>0 accounts</span>
+      <span>0 data collected</span>
+      <span>chrome · firefox · edge · brave</span>
+    </div>
+  </header>
+
+  <!-- how -->
+  <section class="how" id="how">
+    <span class="sec-tag" style="background: var(--butter);">how it works</span>
+    <h2 class="display">reads the listing. <span class="hl-lime">roasts the bots.</span></h2>
+    <div class="how-grid">
+      <div class="card reveal">
+        <span class="num">01</span>
+        <h3>watches with u</h3>
+        <p>Every job card gets parsed the <b>millisecond</b> it appears — no refresh, no button. It just knows.</p>
+      </div>
+      <div class="card reveal">
+        <span class="num">02</span>
+        <h3>checks THE REAL SITE</h3>
+        <p>A <b>TinyFish web agent</b> actually visits the employer's website — looks for a careers page, real team, contact info — and returns a <b>real or AI slop</b> verdict.Patterns only kick in as a fallback.</p>
+      </div>
+      <div class="card reveal">
+        <span class="num">03</span>
+        <h3>stamps & flexes</h3>
+        <p>Score says slop? Card glitches and gets slapped with a big <b>AI SLOP</b> stamp. Hover for receipts: exactly why it got caught and what the agent found on the real company site.</p>
+      </div>
+      <div class="card reveal">
+        <span class="num">04</span>
+        <h3>fallback, not the default</h3>
+        <p>If the agent can't reach a verdict, local rules + optional Gemini/OpenAI <b>second opinion</b> carries the call. Everything else is agent-verified.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- theatre -->
+  <section class="theatre" id="theatre">
+    <span class="sec-tag lilac" style="background: var(--lilac);">receipts</span>
+    <h2 class="display">watch it <span class="hl-butter">catch one.</span></h2>
+    <div class="theatre-grid">
+      <div class="phone reveal">
+        <div class="appbar"><span>linkedin · jobs feed</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="job slop" id="jobBad">
+          <h5>Work From Home — Data Entry Typing</h5>
+          <p class="meta">Dream Global Jobs · urgent hiring · remote</p>
+          <p>Earn ₹5,000/day, no experience!! Registration fee ₹499 via UPI, then WhatsApp 98765XXXXX to start TODAY. Limited seats.</p>
+        </div>
+        <div class="verdict-strip" id="vdBad"><span>slop verdict</span><span class="sc">— scanning…</span></div>
+      </div>
+      <div class="phone reveal">
+        <div class="appbar"><span>naukri · job detail</span><span class="dots"><i></i><i></i><i></i></span></div>
+        <div class="job" id="jobGood">
+          <h5>Senior Backend Engineer — Python/ AWS</h5>
+          <p class="meta">Series-B fintech · hybrid · bengaluru</p>
+          <p>Own the payments stack. 5+ yrs exp, strong SQL. Structured interviews, full benefits, published band ₹28–40 LPA.</p>
+        </div>
+        <div class="verdict-strip" id="vdGood"><span>slop verdict</span><span class="sc ok">— scanning…</span></div>
+      </div>
+    </div>
+    <div class="foot">
+      <button class="btn lilac" id="replayBtn" style="font-size: 13px; padding: 12px 20px;">↻ run it back</button>
+      <span>verdict lands the instant the card appears — this is an exact demo of the plugin</span>
+    </div>
+  </section>
+
+  <!-- patterns -->
+  <section class="patterns" id="patterns">
+    <span class="sec-tag" style="background: var(--lime);">pattern table</span>
+    <h2 class="display">what gets u <span class="hl-lilac">caught:</span></h2>
+    <div class="ptable reveal">
+      <div class="prow"><span class="nm">pay-to-apply</span><span class="ds">asks for a "registration fee" before onboarding 💀</span><span class="wt">w 55</span></div>
+      <div class="prow"><span class="nm">money upfront</span><span class="ds">salary + deposit / "paid training" in the same breath</span><span class="wt">w 50</span></div>
+      <div class="prow"><span class="nm">crypto angle</span><span class="ds">job pitch → crypto/forex/trading profits, we know the type</span><span class="wt">w 45</span></div>
+      <div class="prow"><span class="nm">whatsapp recruiter</span><span class="ds">applies via personal messaging app instead of official channels</span><span class="wt">w 40</span></div>
+      <div class="prow"><span class="nm">guaranteed offer</span><span class="ds">"100% placement" "selection assured" sure buddy</span><span class="wt">w 40</span></div>
+      <div class="prow"><span class="nm">no-skill high pay</span><span class="ds">no degree + no interview + suspiciously generous salary</span><span class="wt">w 30</span></div>
+      <div class="prow"><span class="nm">gmail "HR"</span><span class="ds">sends ur resume to a yahoo/hotmail address, instant left</span><span class="wt">w 30</span></div>
+      <div class="prow"><span class="nm">pressure words</span><span class="ds">URGENT, closing today, limited seats — relax, we're checking</span><span class="wt">w 20</span></div>
+      <div class="prow"><span class="nm">ai-written fluff</span><span class="ds">"rockstar ninja" "wear many hats" "dynamic fast-paced" 🤖</span><span class="wt">w 15</span></div>
+    </div>
+    <div class="legend">
+      <span>≥70 → STAMPED</span>
+      <span>40–69 → suspicious</span>
+      <span>&lt;40 → left alone</span>
+    </div>
+  </section>
+
+  <!-- install -->
+  <section class="install" id="install">
+    <span class="sec-tag" style="background: var(--paper);">install</span>
+    <h2 class="display" style="color: var(--paper);">under a minute. <span class="hl-butter">no signups.</span></h2>
+    <div class="install-grid">
+      <div>
+        <p style="font-weight: 700; font-size: 19px; margin-bottom: 24px; max-width: 26ch;">
+          droppin' it in ur browser takes less time than reading one fake job post.
+        </p>
+        <a class="btn big" href="slop-shield-extension.zip" download>↓ download .zip</a>
+      </div>
+      <ol class="steps reveal">
+        <li>download + unzip anywhere</li>
+        <li>chromium browsers → <code>chrome://extensions</code></li>
+        <li>flip <strong>Developer mode</strong> → hit <strong>Load unpacked</strong> → pick the folder</li>
+        <li>firefox → <code>about:debugging#/runtime/this-firefox</code> → <strong>Load Temporary Add-on</strong> → <code>manifest.json</code></li>
+        <li>open linkedin / indeed / naukri / gmail — slop gets stamped on sight ✌️</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- footer -->
+  <footer>
+    <div class="foot-mark">
+      <span>slop <span class="wob">shield</span></span>
+      <a class="sticker tangerine" href="slop-shield-extension.zip" download style="font-size: 12px;">↓ get it free</a>
+    </div>
+    <div class="foot-row">
+      <span>© 2026 slop shield</span>
+      <span><a href="#top">top ↑</a> · <a href="mailto:hi@slopshield.example">holler</a></span>
+      <span>all detection local · zero tracking · zero cookies</span>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"></script>
+  <script>
+    /* ---------- lenis smooth scroll ---------- */
+    const lenis = window.lenis ? new Lenis({ lerp: 0.13 }) : null;
+    function raf(t) { if (lenis) lenis.raf(t); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
+
+    document.querySelectorAll('a[href^="#"]').forEach((a) => {
+      a.addEventListener('click', (e) => {
+        const id = a.getAttribute('href');
+        if (id.length > 1 && document.querySelector(id)) {
+          e.preventDefault();
+          if (lenis) lenis.scrollTo(id, { offset: -70 });
+          else document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+
+    /* ---------- hero pop-in ---------- */
+    requestAnimationFrame(() => requestAnimationFrame(() => document.body.classList.add('h1-in')));
+
+    /* ---------- reveal on scroll ---------- */
+    const io = new IntersectionObserver((es) => {
+      es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+
+    /* ---------- stamp theatre ---------- */
+    function stampCard(card, isFake) {
+      card.querySelectorAll('.badge, .stamp-big').forEach((n) => n.remove());
+      const badge = document.createElement('span');
+      badge.className = 'badge ' + (isFake ? 'fake' : 'ok');
+      badge.textContent = isFake ? 'AI SLOP' : 'CLEARED';
+      card.appendChild(badge);
+      if (isFake) {
+        const s = document.createElement('div');
+        s.className = 'stamp-big';
+        s.textContent = 'AI Slop';
+        card.appendChild(s);
+        setTimeout(() => s.remove(), 3200);
+      }
+    }
+    const scBad = document.querySelector('#vdBad .sc');
+    const scGood = document.querySelector('#vdGood .sc');
+    function play() {
+      stampCard(document.getElementById('jobBad'), true);
+      scBad.textContent = 'score 100 · slop';
+      setTimeout(() => {
+        stampCard(document.getElementById('jobGood'), false);
+        scGood.textContent = 'score 0 · clean';
+      }, 900);
+    }
+    document.getElementById('replayBtn').addEventListener('click', () => {
+      scBad.textContent = '— scanning…';
+      scGood.textContent = '— scanning…';
+      setTimeout(play, 350);
+    });
+    let played = false;
+    const ioT = new IntersectionObserver((es) => {
+      if (es[0].isIntersecting && !played) { played = true; setTimeout(play, 450); }
+    }, { threshold: 0.4 });
+    ioT.observe(document.getElementById('jobBad'));
+  </script>
+</body>
+</html>

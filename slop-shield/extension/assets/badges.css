@@ -1,0 +1,185 @@
+/* Slop Shield - badges.css
+   Injected on LinkedIn / Indeed / Naukri / Gmail.
+   Styles the "AI Slop" badge and its real-time animation. */
+
+.slop-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px;
+  margin: 4px 6px 0 0;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #fff;
+  cursor: help;
+  position: relative;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  z-index: 9999;
+  white-space: nowrap;
+}
+
+.slop-badge.fake {
+  background: #dc2626;
+  animation: slop-blink 1.1s ease-in-out infinite;
+}
+
+.slop-badge.suspicious {
+  background: #d97706;
+  animation: slop-blink 1.6s ease-in-out infinite;
+}
+
+@keyframes slop-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.slop-badge.scanning {
+  background: #1a1a2e;
+  color: #fff;
+  opacity: 1;
+  animation: slop-pulse 1.05s ease-in-out infinite;
+}
+@keyframes slop-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.slop-badge::before {
+  content: "";
+  font-size: 11px;
+  display: none;
+}
+
+@keyframes slop-shimmer {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+/* Real-time glitch effect on the whole job card when verdict = fake */
+.slop-flagged-fake {
+  position: relative;
+  animation: slop-glitch 0.4s steps(2, jump-none) 3;
+}
+
+@keyframes slop-glitch {
+  0%   { transform: translate(0, 0);     filter: none; }
+  20%  { transform: translate(-2px, 1px); filter: hue-rotate(20deg) saturate(1.4); }
+  40%  { transform: translate(2px, -1px); filter: none; }
+  60%  { transform: translate(-1px, -2px); filter: hue-rotate(-25deg) saturate(1.5); }
+  80%  { transform: translate(1px, 2px);  filter: none; }
+  100% { transform: translate(0, 0);     filter: none; }
+}
+
+/* "AI SLOP" stamp punch-in */
+.slop-stamp {
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-14deg) scale(3.2);
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: rgba(220, 38, 38, 0.85);
+  border: 4px solid rgba(220, 38, 38, 0.85);
+  padding: 6px 18px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  text-transform: uppercase;
+  font-family: Impact, "Arial Black", sans-serif;
+  opacity: 0;
+  z-index: 10000;
+  animation: slop-stamp-in 0.75s cubic-bezier(0.2, 2.4, 0.4, 1) forwards;
+}
+
+@keyframes slop-stamp-in {
+  0%   { opacity: 0;    transform: translate(-50%, -50%) rotate(-14deg) scale(3.2); }
+  60%  { opacity: 1;    transform: translate(-50%, -50%) rotate(-12deg) scale(0.95); }
+  80%  { opacity: 1;    transform: translate(-50%, -50%) rotate(-13deg) scale(1.08); }
+  100% { opacity: 0.92; transform: translate(-50%, -50%) rotate(-13deg) scale(1); }
+}
+
+/* Live tooltip explaining why it was flagged */
+.slop-tip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  width: 280px;
+  background: #18181b;
+  color: #fafafa;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 10001;
+  white-space: normal;
+}
+
+.slop-badge:hover .slop-tip {
+  opacity: 1;
+}
+
+.slop-tip ul {
+  margin: 6px 0 0 16px;
+  padding: 0;
+}
+
+.slop-tip li {
+  margin: 2px 0;
+  color: #fbbf24;
+}
+
+/* Floating dashboard panel (optional advanced view) */
+.slop-panel {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  width: 300px;
+  max-height: 70vh;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.18);
+  padding: 16px;
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+  z-index: 999999;
+}
+
+.slop-panel h3 {
+  margin: 0 0 8px 0;
+  font-size: 15px;
+}
+
+.slop-panel .slop-item {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.slop-panel .slop-verdict {
+  font-weight: 700;
+}
+
+.slop-panel .fake   { color: #dc2626; }
+.slop-panel .suspicious { color: #d97706; }
+.slop-panel .legit  { color: #16a34a; }
+
+/* Reduced motion respect (accessibility) */
+@media (prefers-reduced-motion: reduce) {
+  .slop-badge.fake,
+  .slop-badge.suspicious { animation: none; }
+  .slop-flagged-fake { animation: none; }
+  .slop-stamp { animation: none; opacity: 0.9; }
+}

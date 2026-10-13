@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Slop Shield</title>
+  <style>
+    /* Clean, flat, brand-matched light UI.
+       Flat colors only. Toggles are real <label><input></label> pairs. */
+    :root {
+      --ink: #1a1a2e;
+      --paper: #faf7f2;
+      --card: #ffffff;
+      --lime: #c4f153;
+      --butter: #ffe37e;
+      --tangerine: #ff6b35;
+      --lilac: #c7b9ff;
+      --muted: #6b7280;
+      --border: 2.5px solid var(--ink);
+      --shadow: 4px 4px 0 var(--ink);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      width: 330px;
+      font-family: "Space Grotesk", system-ui, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+    }
+    header {
+      border-bottom: var(--border);
+      padding: 14px 16px 12px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--lilac);
+    }
+    header h1 {
+      font-size: 16px; font-weight: 800; letter-spacing: -0.3px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    header .pill {
+      background: var(--tangerine); color: var(--paper);
+      font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 3px 8px; border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink);
+      transform: rotate(-2deg);
+    }
+    main { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 12px; }
+
+    .card {
+      background: var(--card);
+      border: var(--border);
+      box-shadow: var(--shadow);
+      padding: 12px 13px;
+    }
+    .card-top {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px;
+    }
+    .card-title {
+      font-size: 13.5px; font-weight: 700;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .card-sub { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+
+    /* real, working toggles: label wraps input, track is a sibling span */
+    .switch {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+      flex: none;
+    }
+    .switch input {
+      position: absolute;
+      opacity: 0;
+      width: 44px; height: 24px;
+      margin: 0; cursor: pointer;
+    }
+    .switch .track {
+      width: 44px; height: 24px;
+      border: var(--border);
+      background: #e5e1d8;
+      display: inline-flex;
+      align-items: center;
+      padding: 2px;
+      transition: background 0.2s;
+      pointer-events: none; /* clicks pass to input */
+    }
+    .switch .thumb {
+      width: 16px; height: 16px;
+      background: var(--ink);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      flex: none;
+    }
+    .switch input:checked + .track { background: var(--lime); }
+    .switch input:checked + .track .thumb { transform: translateX(20px); }
+    .switch input:focus-visible + .track { outline: 2px dashed var(--tangerine); outline-offset: 2px; }
+
+    /* segmented control for verify mode */
+    .seg { display: flex; border: var(--border); background: var(--card); overflow: hidden; }
+    .seg label {
+      flex: 1; text-align: center;
+      font-size: 11.5px; font-weight: 700;
+      padding: 9px 6px;
+      cursor: pointer;
+      border-right: var(--border);
+      transition: background 0.15s;
+      user-select: none;
+    }
+    .seg label:last-of-type { border-right: 0; }
+    .seg input { position: absolute; opacity: 0; width: 0; height: 0; }
+    .seg input:checked + label { background: var(--butter); }
+    .seg input:focus-visible + label { outline: 2px dashed var(--tangerine); outline-offset: -3px; }
+
+    .field-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+      margin-bottom: 5px; display: block; color: var(--ink);
+    }
+    input[type="password"], input[type="text"] {
+      width: 100%; padding: 8px 10px;
+      font-size: 12.5px; font-family: "Space Mono", monospace;
+      border: var(--border); background: var(--card); color: var(--ink);
+      outline: none;
+    }
+    input[type="password"]:focus, input[type="text"]:focus {
+      background: #fffde9;
+    }
+    .hint { font-size: 10.5px; color: var(--muted); line-height: 1.55; margin-top: 6px; }
+    .hint a { color: var(--tangerine); font-weight: 700; }
+    .hint b { background: var(--butter); padding: 0 3px; }
+
+    /* stats */
+    .stats { display: flex; gap: 8px; }
+    .stat {
+      flex: 1; text-align: center;
+      border: var(--border); box-shadow: var(--shadow);
+      background: var(--card); padding: 9px 2px;
+    }
+    .stat:nth-child(2) { background: var(--butter); }
+    .stat:nth-child(3) { background: var(--lime); }
+    .stat .num { font-size: 17px; font-weight: 800; line-height: 1; }
+    .stat .lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-top: 3px; color: var(--ink); opacity: 0.75; }
+
+    /* save button */
+    .save {
+      width: 100%;
+      font-family: inherit; font-weight: 800; font-size: 14px;
+      padding: 12px;
+      background: var(--tangerine); color: var(--paper);
+      border: var(--border); box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.14s;
+    }
+    .save:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ink); }
+    .save:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+    .saved {
+      text-align: center; font-size: 11px; font-weight: 700; color: #2e7d32;
+      opacity: 0; transition: opacity 0.25s; margin-top: -4px;
+    }
+    .saved.show { opacity: 1; }
+    .status-dot {
+      width: 9px; height: 9px; border-radius: 50%; display: inline-block;
+      border: 2px solid var(--ink);
+    }
+    .status-dot.on { background: var(--lime); }
+    .status-dot.off { background: #d6d2c9; }
+    footer {
+      padding: 9px 16px 12px; text-align: center;
+      font-size: 9.5px; letter-spacing: 0.04em; color: var(--muted);
+      border-top: var(--border); background: var(--card);
+    }
+    footer a { color: var(--tangerine); font-weight: 700; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><span style="font-size:18px;">🛡️</span> Slop Shield</h1>
+    <span class="pill" id="statusPill">ACTIVE</span>
+  </header>
+
+  <main>
+    <!-- shield toggle -->
+    <div class="card">
+      <div class="card-top">
+        <span class="card-title"><span class="status-dot on" id="dotShield" data-on="on" data-off="off"></span> Shield</span>
+        <label class="switch" for="shieldOn">
+          <input type="checkbox" id="shieldOn" />
+          <span class="track"><span class="thumb"></span></span>
+        </label>
+      </div>
+      <p class="card-sub">Scan job cards on LinkedIn, Indeed, Naukri & Gmail as you browse.</p>
+    </div>
+
+    <!-- verification mode -->
+    <div class="card">
+      <p class="field-label" style="margin-bottom:8px;">Verification</p>
+      <div class="seg" role="radiogroup" aria-label="Verification mode">
+        <input type="radio" name="verifyMode" id="vmAgent" value="auto" />
+        <label for="vmAgent">🌐 Agent scan</label>
+        <input type="radio" name="verifyMode" id="vmOff" value="off" />
+        <label for="vmOff">Patterns only</label>
+      </div>
+      <p class="card-sub" style="margin-top:8px;">
+        <b>Agent scan</b> — a real web agent opens the company's site and judges legitimacy. Needs the key below.<br />
+        <b>Patterns only</b> — purely local, no network calls, works offline.
+      </p>
+      <div id="tinyfishWrap" style="margin-top:10px;">
+        <label class="field-label" for="tinyfishKey">TinyFish API key</label>
+        <input type="password" id="tinyfishKey" placeholder="paste ur key here" autocomplete="off" />
+        <p class="hint">
+          Free key: <a href="https://agent.tinyfish.ai/api-keys" target="_blank" rel="noopener">agent.tinyfish.ai/api-keys</a>.
+          Stored locally, never sent anywhere but TinyFish.
+        </p>
+      </div>
+    </div>
+
+    <!-- fallback AI -->
+    <div class="card">
+      <div class="card-top">
+        <span class="card-title">Fallback AI <span style="font-weight:400; color:var(--muted); font-size:10.5px;">(optional)</span></span>
+        <label class="switch" for="aiEnabled">
+          <input type="checkbox" id="aiEnabled" />
+          <span class="track"><span class="thumb"></span></span>
+        </label>
+      </div>
+      <div id="aiSection" style="margin-top:10px; display:none;">
+        <p class="card-sub">Used only if the agent can't reach a verdict.</p>
+        <div style="margin-top:8px;">
+          <label class="field-label" for="geminiKey">Gemini key</label>
+          <input type="password" id="geminiKey" placeholder="AIza..." autocomplete="off" />
+        </div>
+        <div style="margin-top:8px;">
+          <label class="field-label" for="openaiKey">OpenAI key <span style="font-weight:400; text-transform:none;">(paid)</span></label>
+          <input type="password" id="openaiKey" placeholder="sk-..." autocomplete="off" />
+        </div>
+      </div>
+    </div>
+
+    <!-- stats -->
+    <div class="stats">
+      <div class="stat"><div class="num" id="statScanned">0</div><div class="lbl">scanned</div></div>
+      <div class="stat"><div class="num" id="statFlagged">0</div><div class="lbl">flagged</div></div>
+      <div class="stat"><div class="num" id="statVerified">0</div><div class="lbl">verified</div></div>
+    </div>
+
+    <button class="save" id="save">Save settings</button>
+    <div class="saved" id="saved">✓ saved — everything's live</div>
+  </main>
+
+  <footer>
+    all detection runs locally · <a href="https://agent.tinyfish.ai/api-keys" target="_blank" rel="noopener">get key</a>
+  </footer>
+
+  <script src="./popup.js"></script>
+</body>
+</html>

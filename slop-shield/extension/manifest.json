@@ -1,0 +1,41 @@
+{
+  "manifest_version": 3,
+  "name": "Slop Shield — Fake Job Detector",
+  "version": "0.1.2",
+  "description": "Scans the legitimacy of job listings on LinkedIn, Indeed, Naukri and Gmail with a real web agent (TinyFish) — fakes get stamped AI Slop in real time.",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "optional_permissions": ["notifications"],
+  "host_permissions": [
+    "https://*.linkedin.com/*",
+    "https://*.indeed.com/*",
+    "https://*.naukri.com/*",
+    "https://mail.google.com/*",
+    "https://agent.tinyfish.ai/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.linkedin.com/*",
+        "https://*.indeed.com/*",
+        "https://*.naukri.com/*",
+        "https://mail.google.com/*"
+      ],
+      "css": ["assets/badges.css"],
+      "js": ["src/detector/heuristics.js", "src/detector/engine.js", "src/content/content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "action": {
+    "default_popup": "tde/popup.html",
+    "default_title": "Slop Shield"
+  },
+  "icons": {
+    "16": "assets/icon-16.png",
+    "32": "assets/icon-32.png",
+    "48": "assets/icon-48.png",
+    "128": "assets/icon-128.png"
+  }
+}

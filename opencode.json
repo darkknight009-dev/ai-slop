@@ -1,0 +1,13 @@
+{
+  "mcp": {
+    "servers": {
+      "tinyfish": {
+        "type": "remote",
+        "url": "https://agent.tinyfish.ai/mcp?source=tinyfish_cli&client=opencode&connect_attempt_id=3b57ffb5-df21-44df-a093-c868ce9878d8",
+        "headers": {
+          "X-API-Key": "sk-tinyfish-rpkRNg5_Y2rYEGEuoUBsBEejel86Ol1E"
+        }
+      }
+    }
+  }
+}
